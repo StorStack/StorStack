@@ -1,0 +1,140 @@
+'\" t
+.\"     Title: nvme-create-ns
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 01/30/2023
+.\"    Manual: NVMe Manual
+.\"    Source: NVMe
+.\"  Language: English
+.\"
+.TH "NVME\-CREATE\-NS" "1" "01/30/2023" "NVMe" "NVMe Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+nvme-create-ns \- Send NVMe Namespace management command to create namespace, returns results\&.
+.SH "SYNOPSIS"
+.sp
+.nf
+\fInvme create\-ns\fR <device> [\-\-nsze=<nsze> | \-s <nsze>]
+                        [\-\-ncap=<ncap> | \-c <ncap>]
+                        [\-\-flbas=<flbas> | \-f <flbas>]
+                        [\-\-dps=<dps> | \-d <dps>]
+                        [\-\-nmic=<nmic> | \-m <nmic>]
+                        [\-\-anagrp\-id=<anagrpid> | \-a <anagrpid>]
+                        [\-\-nvmset\-id=<nvmsetid> | \-i <nvmsetid>]
+                        [\-\-csi=<command_set_identifier> | \-y <command_set_identifier>]
+                        [\-\-lbstm=<lbstm> | \-l <lbstm>]
+                        [\-\-block\-size=<block\-size> | \-b <block\-size>]
+                        [\-\-timeout=<timeout> | \-t <timeout>]
+                        [\-\-nsze\-si=<nsze\-si> | \-S <nsze\-si>]
+                        [\-\-ncap\-si=<ncap\-si> | \-C <ncap\-si>]
+.fi
+.SH "DESCRIPTION"
+.sp
+For the NVMe device given, sends a namespace management command to create the namespace with the requested settings\&. On success, the namespace identifier assigned by the controller is returned\&.
+.sp
+The <device> parameter is mandatory and may be either the NVMe character device (ex: /dev/nvme0), or a namespace block device (ex: /dev/nvme0n1)\&.
+.SH "OPTIONS"
+.PP
+\-s, \-\-nsze
+.RS 4
+The namespace size\&.
+.RE
+.PP
+\-c, \-\-ncap
+.RS 4
+The namespace capacity\&.
+.RE
+.PP
+\-f, \-\-flbas
+.RS 4
+The namespace formatted logical block size setting\&. Conflicts with \-\-block\-size argument\&.
+.RE
+.PP
+\-d, \-\-dps
+.RS 4
+The data protection settings\&.
+.RE
+.PP
+\-m, \-\-nmic
+.RS 4
+Namespace multipath and sharing capabilities\&.
+.RE
+.PP
+\-a, \-\-anagrp\-id
+.RS 4
+ANA Group Identifier\&. If this value is 0h specifies that the controller determines the value to use
+.RE
+.PP
+\-i <nvmsetid>, \-\-nvmset\-id=<nvmsetid>
+.RS 4
+This field specifies the identifier of the NVM Set\&.
+.RE
+.PP
+\-y <command_set_identifier>, \-\-csi=<command_set_identifier>
+.RS 4
+This field specifies the identifier of command set\&. if not issued, NVM Command Set will be selected\&.
+.RE
+.PP
+\-l <lbstm>, \-\-lbstm=<lbstm>
+.RS 4
+Logical Block Storage Tag Mask for end\-to\-end protection\&.
+.RE
+.PP
+\-b, \-\-block\-size
+.RS 4
+Target block size the new namespace should be formatted as\&. Potential FLBAS values will be values will be scanned and the lowest numbered will be selected for the create\-ns operation\&. Conflicts with \-\-flbas argument\&.
+.RE
+.PP
+\-S, \-\-nsze\-si
+.RS 4
+The namespace size (NSZE) in standard SI units\&. The value SI suffixed is divided by the namespace LBA size to set as NSZE\&. If the value not suffixed it is set as same with the nsze option\&.
+.RE
+.PP
+\-C, \-\-ncap\-si
+.RS 4
+The namespace capacity (NCAP) in standard SI units\&. The value SI suffixed is divided by the namespace LBA size to set as NCAP\&. If the value not suffixed it is set as same with the ncap option\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Create a namespace:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# nvme create\-ns /dev/nvme0 \-\-nsze 11995709440 \-\-ncap 1199570940 \-\-flbas 0 \-\-dps 0 \-\-nmic 0
+# nvme create\-ns /dev/nvme0 \-\-nsze\-si 6\&.14T \-\-ncap 1199570940 \-\-flbas 0 \-\-dps 0 \-\-nmic 0
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "NVME"
+.sp
+Part of the nvme\-user suite

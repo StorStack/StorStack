@@ -1,0 +1,14 @@
+[Unit]
+Description=Connect NVMe-oF subsystems automatically during boot
+ConditionPathExists=|!@SYSCONFDIR@/nvme/config.json
+ConditionPathExists=|!@SYSCONFDIR@/nvme/discovery.conf
+After=network-online.target
+Before=remote-fs-pre.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/sbin/modprobe nvme-fabrics
+ExecStart=@SBINDIR@/nvme connect-all
+
+[Install]
+WantedBy=default.target

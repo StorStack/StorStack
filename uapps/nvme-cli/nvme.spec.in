@@ -1,0 +1,66 @@
+Name: 		nvme
+Version: 	@VERSION@
+Release: 	1%{?dist}
+Summary:  	Core nvme tools
+License: 	GPL-2.0-only
+Group: 		Development/Tools
+URL: 		https://github.com/linux-nvme/nvme-cli/
+Provides:	nvme
+Requires(post): util-linux systemd systemd-udev
+BuildRoot:	%{_tmppath}/%{name}-%{version}-root
+@REQUIRES@
+
+%description
+NVMe is a fast, scalable, direct attached storage interface. The nvme
+cli rpm installs core management tools with minimal dependencies.
+
+%install
+meson install --destdir %{buildroot} --skip-subprojects
+touch %{buildroot}@SYSCONFDIR@/nvme/hostnqn
+touch %{buildroot}@SYSCONFDIR@/nvme/hostid
+
+%files
+%defattr(-,root,root)
+@SBINDIR@/nvme
+@MANDIR@/man1/nvme*.1*
+@DATADIR@/bash-completion/completions/nvme
+@DATADIR@/zsh/site-functions/_nvme
+%dir @SYSCONFDIR@/nvme
+@SYSCONFDIR@/nvme/hostnqn
+@SYSCONFDIR@/nvme/hostid
+@SYSCONFDIR@/nvme/discovery.conf
+%ghost @SYSCONFDIR@/nvme/config.json
+@UDEVRULESDIR@/70-nvmf-autoconnect.rules
+@UDEVRULESDIR@/71-nvmf-iopolicy-netapp.rules
+@DRACUTRILESDIR@/70-nvmf-autoconnect.conf
+@SYSTEMDDIR@/nvmf-connect@.service
+@SYSTEMDDIR@/nvmefc-boot-connections.service
+@SYSTEMDDIR@/nvmf-connect.target
+@SYSTEMDDIR@/nvmf-autoconnect.service
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
+	if [ ! -s @SYSCONFDIR@/nvme/hostnqn ]; then
+		echo $(@SBINDIR@/nvme gen-hostnqn) > @SYSCONFDIR@/nvme/hostnqn
+        fi
+        if [ ! -s @SYSCONFDIR@/nvme/hostid ]; then
+                uuidgen > @SYSCONFDIR@/nvme/hostid
+        fi
+
+	# apply udev and systemd changes that we did
+	systemctl daemon-reload
+	udevadm control --reload-rules && udevadm trigger
+fi
+
+%changelog
+* Tue Dec 17 2019 Simon Schricker <sschricker@suse.de>
+  - Add new udev rules to set iopolicy for NetApp devices
+
+* Mon Oct 15 2018 Eyal Ben-David <eyalbe@il.ibm.com> - 1.6.81.g899a-2
+- bash-completion check
+
+* Thu Oct 15 2015 Keith Busch <keith.busch@intel.com>
+- Initial RPM spec
